@@ -9,6 +9,8 @@
  * Copyright IBM Corporation, 2008
  */
 
+// comment
+
 #include <linux/kvm_host.h>
 #include <linux/export.h>
 #include <linux/vmalloc.h>
