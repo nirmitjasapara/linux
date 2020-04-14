@@ -1,0 +1,18 @@
+Nirmit Jasapara
+014538355
+By Myself
+Assignment 1
+
+1. Downloaded and installed VMWare.
+2. Dowloaded Ubuntu and created a VM with it.
+3. Installed git, flex, bison, etc. according to the changes.rst file
+4. Forked the Linux kernel
+5. Cloned it to the home directory
+6. Did Make olddefconfig
+7. Did Make
+8. Created an assignment1 directory and put starter code in it
+9. Looked up my processor’s family and model according to AMD (Fx-8350 to Family 15h, model 10h - 1Fh)
+10. Found the SDM for my processor
+11. Found the CPUID instruction
+12. Put the 9 other bit’s info in the code
+13. Ran makefile
