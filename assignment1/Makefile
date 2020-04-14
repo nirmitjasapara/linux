@@ -1,4 +1,4 @@
-obj-m += cmpe283-1.o
+obj-m += cmpe283-1-amd.o
 
 all:
 		make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
