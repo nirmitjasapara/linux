@@ -1056,6 +1056,15 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
 }
 EXPORT_SYMBOL_GPL(kvm_cpuid);
 
+static atomic64_t num_exits = ATOMIC_INIT(0);
+EXPORT_SYMBOL(num_exits);
+static atomic64_t exit_time = ATOMIC_INIT(0);
+EXPORT_SYMBOL(exit_time);
+static atomic64_t exits[1025];
+static atomic64_t times[1025];
+EXPORT_SYMBOL(exits);
+EXPORT_SYMBOL(times);
+
 int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 {
 	u32 eax, ebx, ecx, edx;
@@ -1065,7 +1074,34 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 
 	eax = kvm_rax_read(vcpu);
 	ecx = kvm_rcx_read(vcpu);
-	kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, true);
+	switch (eax) {
+		case 0x4FFFFFFF: eax = atomic64_read(&num_exits); break;
+		case 0x4FFFFFFE:
+		ebx = (uint32_t)((atomic64_read(&exit_time)) >> 32);
+		ecx = (uint32_t)(atomic64_read(&exit_time) & 0xFFFFFFFFLL); break;
+		case 0x4FFFFFFD:
+		if (ecx < 0 || (ecx > 136 && ecx != 1024))
+		{
+			eax = 0;
+			ebx = 0;
+			ecx = 0;
+			edx = 0xFFFFFFFF;
+			break;
+		}
+		eax = atomic64_read(&exits[(int)ecx]);
+		case 0x4FFFFFFC:
+		if (ecx < 0 || (ecx > 136 && ecx != 1024))
+		{
+			eax = 0;
+			ebx = 0;
+			ecx = 0;
+			edx = 0xFFFFFFFF;
+			break;
+		}
+		ebx = (uint32_t) ((atomic64_read(&times[(int)ecx])) >> 32);
+		ecx = (uint32_t) ((atomic64_read(&times[(int)ecx]) & 0xFFFFFFFF ));
+		default: kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, true); break;
+	}
 	kvm_rax_write(vcpu, eax);
 	kvm_rbx_write(vcpu, ebx);
 	kvm_rcx_write(vcpu, ecx);

@@ -5790,6 +5790,11 @@ void dump_vmcs(void)
 		       vmcs_read16(VIRTUAL_PROCESSOR_ID));
 }
 
+
+extern atomic64_t num_exits;
+extern atomic64_t exits[1025];
+extern atomic64_t times[1025];
+extern atomic64_t exit_time;
 /*
  * The guest has exited.  See if we can fix it or if we need userspace
  * assistance.
@@ -5801,6 +5806,8 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu,
 	u32 exit_reason = vmx->exit_reason;
 	u32 vectoring_info = vmx->idt_vectoring_info;
 
+	atomic64_inc(&num_exits);
+	u64 start = rdtsc();
 	trace_kvm_exit(exit_reason, vcpu, KVM_ISA_VMX);
 
 	/*
@@ -5814,11 +5821,15 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu,
 		vmx_flush_pml_buffer(vcpu);
 
 	/* If guest state is invalid, start emulating */
-	if (vmx->emulation_required)
+	if (vmx->emulation_required) {
+		atomic64_add(rdtsc() - start, &exit_time);
 		return handle_invalid_guest_state(vcpu);
+	}
 
-	if (is_guest_mode(vcpu) && nested_vmx_exit_reflected(vcpu, exit_reason))
+	if (is_guest_mode(vcpu) && nested_vmx_exit_reflected(vcpu, exit_reason)){
+		atomic64_add(rdtsc() - start, &exit_time);
 		return nested_vmx_reflect_vmexit(vcpu, exit_reason);
+	}
 
 	if (exit_reason & VMX_EXIT_REASONS_FAILED_VMENTRY) {
 		dump_vmcs();
@@ -5908,6 +5919,9 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu,
 	if (!kvm_vmx_exit_handlers[exit_reason])
 		goto unexpected_vmexit;
 
+			atomic64_inc(&exits[exit_reason]);
+			atomic64_add(rdtsc() - start, &exit_time);
+			atomic64_add(rdtsc() - start, &times[exit_reason]);
 	return kvm_vmx_exit_handlers[exit_reason](vcpu);
 
 unexpected_vmexit:
