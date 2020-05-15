@@ -5919,10 +5919,11 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu,
 	if (!kvm_vmx_exit_handlers[exit_reason])
 		goto unexpected_vmexit;
 
-			atomic64_inc(&exits[exit_reason]);
-			atomic64_add(rdtsc() - start, &exit_time);
-			atomic64_add(rdtsc() - start, &times[exit_reason]);
-	return kvm_vmx_exit_handlers[exit_reason](vcpu);
+	int ret = kvm_vmx_exit_handlers[exit_reason](vcpu);
+	atomic64_inc(&exits[exit_reason]);
+	atomic64_add(rdtsc() - start, &exit_time);
+	atomic64_add(rdtsc() - start, &times[exit_reason]);
+	return ret;
 
 unexpected_vmexit:
 	vcpu_unimpl(vcpu, "vmx: unexpected exit reason 0x%x\n", exit_reason);
