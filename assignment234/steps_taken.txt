@@ -1,0 +1,15 @@
+Nirmit Jasapara
+014538355
+By Myself
+Assignment 2 and 3
+
+1. Added code in cpuid.c and kvm.c for exit count like walkthrough
+2. Changed code in cpuid.c and kvm.c to use atomic
+3. Found out out how to time and implemented code.
+4. Found out AMD's exit number and valid exits and added last 2 leaves accordingly.
+5. Added Invalid ecx functionality
+6. ran make modules
+7. used vert-manager to run VM
+8. installed cpuid and ran it on all the leaves.
+
+Assignment 4
