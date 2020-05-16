@@ -9,7 +9,18 @@ Assignment 2 and 3
 4. Found out AMD's exit number and valid exits and added last 2 leaves accordingly.
 5. Added Invalid ecx functionality
 6. ran make modules
-7. used vert-manager to run VM
-8. installed cpuid and ran it on all the leaves.
+7. insmod kvm.ko and kvm_amd.ko
+8. Ran into error and manually downloaded linux 5.7 for ubuntu and applied it.
+9. Used custom Makefile to make the module so it can insmod.
+10. installed cpuid and ran it on all the leaves.
 
 Assignment 4
+
+1. Downloaded Virt-Manager and a ubuntu iso for it.
+2. Ran the VM
+3. Got the total exit counts
+4. Exit VM
+5. removed and installed kvm-amd.ko with ept=0
+6. Retart VM and get exit counts
+
+Questions:
